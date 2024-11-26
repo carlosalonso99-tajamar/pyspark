@@ -174,6 +174,21 @@ Esta cheatsheet te ayudará a dominar los conceptos esenciales de PySpark, espec
 
 ### 6. Eliminar Valores Nulos
 
+- **Mostrar filas con valores nulos**
+```python
+from pyspark.sql.functions import col
+
+# Crear una condición que verifica si cualquier columna tiene valores nulos
+condition = [col(c).isNull() for c in df.columns]
+
+# Filtrar filas que tengan al menos un valor nulo
+df_con_nulos = df.filter(any(condition))
+
+df_con_nulos.show()
+
+
+```
+
 - **Eliminar filas con nulos:** `df.na.drop()`
   Elimina las filas que contienen valores `NULL`. Puedes usar parámetros adicionales para eliminar filas solo si ciertas columnas tienen valores nulos.
 
@@ -181,6 +196,9 @@ Esta cheatsheet te ayudará a dominar los conceptos esenciales de PySpark, espec
 
   ```python
   df = df.na.drop(subset=["Power", "Pokemon"])
+
+  #con al menos n columnas con nulos
+  df.dropna(thresh=n)
   ```
 
   Solo elimina las filas si las columnas especificadas tienen valores nulos.
