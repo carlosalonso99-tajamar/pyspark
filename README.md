@@ -1,4 +1,7 @@
 # PySpark Cheatsheet para Examen: DataFrames y Datasets
+[- Docs pyspark Databricks](https://api-docs.databricks.com/python/pyspark/latest/index.html)
+
+[- Docs pyspark oficial](https://spark.apache.org/docs/latest/api/python/index.html)
 
 Esta cheatsheet te ayudará a dominar los conceptos esenciales de PySpark, específicamente para trabajar con DataFrames (DF) y Datasets (DS). Aquí encontrarás una explicación detallada sobre cómo crear, manipular y trabajar con DataFrames y Datasets para que puedas prepararte de manera óptima y lograr un 10 en tu examen. Además de conceptos básicos, también cubriremos operaciones avanzadas, mejores prácticas, y ejemplos de preguntas del examen que te ayudarán a poner en práctica todos los conocimientos adquiridos. Esta guía es completa y te permitirá tener todos los recursos necesarios para enfrentarte al examen sin problemas.
 
