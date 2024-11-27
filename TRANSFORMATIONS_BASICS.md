@@ -1,4 +1,7 @@
 # README: Transformaciones en Apache Spark
+[- Docs pyspark Databricks](https://api-docs.databricks.com/python/pyspark/latest/index.html)
+
+[- Docs pyspark oficial](https://spark.apache.org/docs/latest/api/python/index.html)
 
 Este documento detalla las principales transformaciones que se pueden realizar en Apache Spark, incluyendo transformaciones básicas y avanzadas tanto en RDDs como en DataFrames. Esta guía te ayudará a entender cómo manipular y transformar los datos de manera eficiente utilizando Spark.
 
@@ -26,6 +29,7 @@ Este documento detalla las principales transformaciones que se pueden realizar e
    - 3.14 [Transformaciones Condicionales (`when()` y `otherwise()`)](#314-transformaciones-condicionales-when-y-otherwise)
    - 3.15 [Funciones Definidas por el Usuario (UDFs)](#315-funciones-definidas-por-el-usuario-udfs)
    - 3.16 [Expresiones Regulares (`regexp_extract()`, `regexp_replace()`)](#316-expresiones-regulares-regexp_extract-y-regexp_replace)
+   - 3.17 [Transformaciones de Fechas (`to_date()`, `to_timestamp()`)](#317-transformaciones-de-fechas-to_date-to_timestamp)
 4. [Transformaciones en RDDs](#4-transformaciones-en-rdds)
    - 4.1 [`map()`](#41-map)
    - 4.2 [`flatMap()`](#42-flatmap)
@@ -120,6 +124,14 @@ df_cross = df1.crossJoin(df2)
 ```
 
 ### 3.9 `fillna()` / `replace()`
+Para comprobar las colunmas con null
+```python
+df_nulls = df.select([F.count(when(col(c).isNull(), c)).alias(c) for c in df.columns])
+```
+Remplazar nulos de columnas concretas
+```python
+df = df.fillna({"Description": "Unknown"})
+```
 Reemplaza valores nulos o específicos en el DataFrame.
 ```python
 df_filled = df.fillna(0)
@@ -186,6 +198,43 @@ df_extract = df.withColumn("CodigoPostal", regexp_extract(df["Direccion"], r"\d{
 df_replace = df.withColumn("Direccion_Limpia", regexp_replace(df["Direccion"], r"\d{5}", "XXXXX"))
 ```
 
+### 3.17 Transformaciones de Fechas (`to_date()`, `to_timestamp()`)
+Permiten convertir columnas de fecha en un formato estándar.
+```python
+from pyspark.sql.functions import to_date, to_timestamp
+
+# Convertir una columna de fecha a tipo Date
+df_fecha = df.withColumn("InvoiceDate", to_date(df["InvoiceDate"], "dd/MM/yyyy"))
+
+# Convertir una columna de fecha a tipo Timestamp
+df_timestamp = df.withColumn("InvoiceDate", to_timestamp(df["InvoiceDate"], "dd/MM/yyyy HH:mm"))
+```
+
+### 3.18 Comprobacion del formato de fechas
+```python
+from pyspark.sql.functions import col, regexp_extract
+
+# Expresión regular para fechas en el formato "dd/MM/yyyy HH:mm"
+date_format_regex = r"^\d{2}/\d{2}/\d{4} \d{2}:\d{2}$"
+
+# Crear una nueva columna 'valid_format' que comprueba si la fecha cumple con el formato
+df = df.withColumn("valid_format", regexp_extract(col("InvoiceDate"), date_format_regex, 0))
+
+# Filtrar las filas con fechas inválidas
+df_invalid_dates = df.filter(col("valid_format") == "")
+
+# Contar cuántas filas tienen fechas inválidas
+invalid_count = df_invalid_dates.count()
+
+if invalid_count > 0:
+    print(f"Se encontraron {invalid_count} filas con fechas en un formato incorrecto.")
+    df_invalid_dates.show(truncate=False)  # Muestra las filas con fechas inválidas para revisar los errores
+else:
+    print("Todas las fechas tienen el formato correcto.")
+```
+
+Estas funciones son útiles para estandarizar las fechas, facilitando el análisis y procesamiento posterior de los datos.
+
 ## 4. Transformaciones en RDDs
 
 ### 4.1 `map()`
@@ -244,4 +293,3 @@ df_persistido.show()
 Apache Spark ofrece una variedad de transformaciones para manipular y transformar datos de manera eficiente. Desde transformaciones básicas como `select()` y `filter()`, hasta técnicas más avanzadas como `groupBy()` y `pivot()`, comprender y aplicar correctamente estas herramientas es esencial para el procesamiento de datos a gran escala. Además, la optimización mediante `repartition()`, `coalesce()`, y el uso adecuado de la persistencia permite mejorar significativamente el rendimiento de tus tareas Spark.
 
 Este documento sirve como una referencia práctica para aplicar estas transformaciones, ayudándote a sacar el máximo provecho de Spark en tus proyectos de análisis y procesamiento de datos.
-
