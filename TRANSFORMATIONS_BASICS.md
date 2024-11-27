@@ -202,6 +202,29 @@ df_fecha = df.withColumn("InvoiceDate", to_date(df["InvoiceDate"], "dd/MM/yyyy")
 df_timestamp = df.withColumn("InvoiceDate", to_timestamp(df["InvoiceDate"], "dd/MM/yyyy HH:mm"))
 ```
 
+### 3.18 Comprobacion del formato de fechas
+```python
+from pyspark.sql.functions import col, regexp_extract
+
+# Expresión regular para fechas en el formato "dd/MM/yyyy HH:mm"
+date_format_regex = r"^\d{2}/\d{2}/\d{4} \d{2}:\d{2}$"
+
+# Crear una nueva columna 'valid_format' que comprueba si la fecha cumple con el formato
+df = df.withColumn("valid_format", regexp_extract(col("InvoiceDate"), date_format_regex, 0))
+
+# Filtrar las filas con fechas inválidas
+df_invalid_dates = df.filter(col("valid_format") == "")
+
+# Contar cuántas filas tienen fechas inválidas
+invalid_count = df_invalid_dates.count()
+
+if invalid_count > 0:
+    print(f"Se encontraron {invalid_count} filas con fechas en un formato incorrecto.")
+    df_invalid_dates.show(truncate=False)  # Muestra las filas con fechas inválidas para revisar los errores
+else:
+    print("Todas las fechas tienen el formato correcto.")
+```
+
 Estas funciones son útiles para estandarizar las fechas, facilitando el análisis y procesamiento posterior de los datos.
 
 ## 4. Transformaciones en RDDs
