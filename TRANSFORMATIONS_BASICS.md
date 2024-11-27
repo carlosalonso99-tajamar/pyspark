@@ -29,6 +29,7 @@ Este documento detalla las principales transformaciones que se pueden realizar e
    - 3.14 [Transformaciones Condicionales (`when()` y `otherwise()`)](#314-transformaciones-condicionales-when-y-otherwise)
    - 3.15 [Funciones Definidas por el Usuario (UDFs)](#315-funciones-definidas-por-el-usuario-udfs)
    - 3.16 [Expresiones Regulares (`regexp_extract()`, `regexp_replace()`)](#316-expresiones-regulares-regexp_extract-y-regexp_replace)
+   - 3.17 [Transformaciones de Fechas (`to_date()`, `to_timestamp()`)](#317-transformaciones-de-fechas-to_date-to_timestamp)
 4. [Transformaciones en RDDs](#4-transformaciones-en-rdds)
    - 4.1 [`map()`](#41-map)
    - 4.2 [`flatMap()`](#42-flatmap)
@@ -189,6 +190,20 @@ df_extract = df.withColumn("CodigoPostal", regexp_extract(df["Direccion"], r"\d{
 df_replace = df.withColumn("Direccion_Limpia", regexp_replace(df["Direccion"], r"\d{5}", "XXXXX"))
 ```
 
+### 3.17 Transformaciones de Fechas (`to_date()`, `to_timestamp()`)
+Permiten convertir columnas de fecha en un formato estándar.
+```python
+from pyspark.sql.functions import to_date, to_timestamp
+
+# Convertir una columna de fecha a tipo Date
+df_fecha = df.withColumn("InvoiceDate", to_date(df["InvoiceDate"], "dd/MM/yyyy"))
+
+# Convertir una columna de fecha a tipo Timestamp
+df_timestamp = df.withColumn("InvoiceDate", to_timestamp(df["InvoiceDate"], "dd/MM/yyyy HH:mm"))
+```
+
+Estas funciones son útiles para estandarizar las fechas, facilitando el análisis y procesamiento posterior de los datos.
+
 ## 4. Transformaciones en RDDs
 
 ### 4.1 `map()`
@@ -247,4 +262,3 @@ df_persistido.show()
 Apache Spark ofrece una variedad de transformaciones para manipular y transformar datos de manera eficiente. Desde transformaciones básicas como `select()` y `filter()`, hasta técnicas más avanzadas como `groupBy()` y `pivot()`, comprender y aplicar correctamente estas herramientas es esencial para el procesamiento de datos a gran escala. Además, la optimización mediante `repartition()`, `coalesce()`, y el uso adecuado de la persistencia permite mejorar significativamente el rendimiento de tus tareas Spark.
 
 Este documento sirve como una referencia práctica para aplicar estas transformaciones, ayudándote a sacar el máximo provecho de Spark en tus proyectos de análisis y procesamiento de datos.
-
