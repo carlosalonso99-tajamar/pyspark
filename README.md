@@ -563,24 +563,24 @@ df_con_nulos.show()
 
   - **Pruebas de formateo automatico**
   ```python
-  from pyspark.sql import SparkSession
-from pyspark.sql.functions import col
-
-# Crear la sesión de Spark
-spark = SparkSession.builder.appName('ManejoCSV').getOrCreate()
-
-# Cargar el archivo CSV mal formateado con opciones para manejar los errores
-df = spark.read.format("csv") \
-    .option("header", "true") \
-    .option("delimiter", ",") \
-    .option("multiLine", "true") \
-    .option("escape", "\"") \
-    .option("mode", "PERMISSIVE") \
-    .load("dbfs:/FileStore/shared_uploads/carlosalonsomingo@gmail.com/ventsa.csv")
-
-# Mostrar los datos cargados
-df.show(truncate=False)
-```
+    from pyspark.sql import SparkSession
+  from pyspark.sql.functions import col
+  
+  # Crear la sesión de Spark
+  spark = SparkSession.builder.appName('ManejoCSV').getOrCreate()
+  
+  # Cargar el archivo CSV mal formateado con opciones para manejar los errores
+  df = spark.read.format("csv") \
+      .option("header", "true") \
+      .option("delimiter", ",") \
+      .option("multiLine", "true") \
+      .option("escape", "\"") \
+      .option("mode", "PERMISSIVE") \
+      .load("dbfs:/FileStore/shared_uploads/carlosalonsomingo@gmail.com/ventsa.csv")
+  
+  # Mostrar los datos cargados
+  df.show(truncate=False)
+  ```
 
   Cambia el número de particiones del DataFrame para mejorar la paralelización y el rendimiento, especialmente si tienes operaciones que requieren una mayor distribución
 
