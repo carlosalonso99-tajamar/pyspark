@@ -124,6 +124,11 @@ df_cross = df1.crossJoin(df2)
 ```
 
 ### 3.9 `fillna()` / `replace()`
+Para comprobar las colunmas con null
+```python
+df_nulls = df.select([F.count(when(col(c).isNull(), c)).alias(c) for c in df.columns])
+```
+
 Reemplaza valores nulos o específicos en el DataFrame.
 ```python
 df_filled = df.fillna(0)
