@@ -106,15 +106,18 @@ sns.boxplot(data=iris, x='species', y='sepal_length')
 plt.title('Diagrama de Caja de la Longitud del Sépalo por Especie')
 plt.show()
 ```
+# Funciones para Facilitar la Graficación
 
-## 5. Funciones para Facilitar la Graficación
-Para facilitar el proceso de creación de gráficos, podemos definir algunas funciones comunes que reutilicen configuraciones y simplifiquen el código. Estas funciones permiten crear visualizaciones de manera más rápida y con menos líneas de código.
+Para facilitar el proceso de creación de gráficos, aquí se presentan algunas funciones comunes que reutilizan configuraciones y simplifican el código. Estas funciones permiten crear visualizaciones de manera más rápida y con menos líneas de código utilizando **Matplotlib** y **Seaborn**.
 
-### 5.1 Función para Gráfico de Líneas
+## 5 Funciones para Facilitar la Graficación
+## 5.1 Función para Gráfico de Líneas
 ```python
 import matplotlib.pyplot as plt
 
-def plot_line(x, y, xlabel='X', ylabel='Y', title='Gráfico de Línea', color='blue', linestyle='-', marker='o'):
+def plot_line(df, x_col, y_col, xlabel='X', ylabel='Yd', title='Gráfico de Línea', color='blue', linestyle='-', marker='o'):
+    x = df.select(x_col).rdd.flatMap(lambda x: x).collect()
+    y = df.select(y_col).rdd.flatMap(lambda x: x).collect()
     plt.plot(x, y, color=color, linestyle=linestyle, marker=marker)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
@@ -122,45 +125,119 @@ def plot_line(x, y, xlabel='X', ylabel='Y', title='Gráfico de Línea', color='b
     plt.grid(True)
     plt.show()
 
-# Uso de la función
-plot_line([1, 2, 3, 4], [10, 20, 30, 40], xlabel='Días', ylabel='Ventas', title='Ventas Diarias')
+# Uso de la función (suponiendo que df_mas_vendidos es un DataFrame de PySpark)
+plot_line(df_mas_vendidos, "StockCode", "Ventas", xlabel='Producto', ylabel='Ventas', title='Más Vendidos')
 ```
 
-### 5.2 Función para Gráfico de Barras con Seaborn
+## 5.2 Función para Gráfico de Barras con Seaborn
 ```python
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-def plot_bar(x, y, xlabel='X', ylabel='Y', title='Gráfico de Barras', palette='viridis'):
+def plot_bar_seaborn(df, x_col, y_col, title="", x_label="", y_label="", figsize=(10, 6), palette="viridis"):
+    x = df.select(x_col).rdd.flatMap(lambda x: x).collect()
+    y = df.select(y_col).rdd.flatMap(lambda x: x).collect()
+    plt.figure(figsize=figsize)
     sns.barplot(x=x, y=y, palette=palette)
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
-    plt.title(title)
+    plt.title(title, fontsize=14)
+    plt.xlabel(x_label, fontsize=12)
+    plt.ylabel(y_label, fontsize=12)
+    plt.xticks(rotation=45)
+    plt.tight_layout()
     plt.show()
 
-# Uso de la función
-plot_bar(['A', 'B', 'C', 'D'], [5, 7, 8, 6], xlabel='Categorías', ylabel='Valores', title='Valores por Categoría')
+# Uso de la función (suponiendo que df_mas_vendidos es un DataFrame de PySpark)
+plot_bar_seaborn(df_mas_vendidos, "StockCode", "Ventas", title='Más Vendidos', x_label='Producto', y_label='Ventas')
 ```
 
-### 5.3 Función para Gráfico de Dispersión con Seaborn
+## 5.3 Función para Gráfico de Barras con Matplotlib
+```python
+import matplotlib.pyplot as plt
+
+def plot_bar_matplotlib(df, x_col, y_col, title="", x_label="", y_label="", figsize=(10, 6), color="skyblue"):
+    x = df.select(x_col).rdd.flatMap(lambda x: x).collect()
+    y = df.select(y_col).rdd.flatMap(lambda x: x).collect()
+    plt.figure(figsize=figsize)
+    plt.bar(x, y, color=color)
+    plt.title(title, fontsize=14)
+    plt.xlabel(x_label, fontsize=12)
+    plt.ylabel(y_label, fontsize=12)
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()
+
+# Uso de la función (suponiendo que df_mas_vendidos es un DataFrame de PySpark)
+plot_bar_matplotlib(df_mas_vendidos, "StockCode", "Ventas", title='Más Vendidos', x_label='Producto', y_label='Ventas')
+```
+
+## 5.4 Función para Gráfico de Dispersión con Seaborn
 ```python
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-def plot_scatter(data, x, y, hue=None, title='Gráfico de Dispersión'):
-    sns.scatterplot(data=data, x=x, y=y, hue=hue)
-    plt.title(title)
+def plot_scatter(df, x_col, y_col, hue=None, title='Gráfico de Dispersión', figsize=(10, 6)):
+    data = df.toPandas()
+    plt.figure(figsize=figsize)
+    sns.scatterplot(data=data, x=x_col, y=y_col, hue=hue)
+    plt.title(title, fontsize=14)
+    plt.tight_layout()
     plt.show()
 
-# Uso de la función
-iris = sns.load_dataset('iris')
-plot_scatter(iris, x='sepal_length', y='sepal_width', hue='species', title='Relación entre Largo y Ancho de Sépalo')
+# Uso de la función (suponiendo que iris_df es un DataFrame de PySpark)
+plot_scatter(iris_df, x_col='sepal_length', y_col='sepal_width', hue='species', title='Relación entre Largo y Ancho de Sépalo')
 ```
 
-## 6. Resumen
-- **Matplotlib** es ideal para un control detallado sobre los elementos visuales, mientras que **Seaborn** se enfoca en la simplicidad para gráficos estadísticos.
-- **Matplotlib** permite personalizar aspectos como colores, estilos de línea y leyendas, mientras que **Seaborn** proporciona gráficos más ricos y atractivos con menos código.
-- Ambas bibliotecas son complementarias y, a menudo, se utilizan juntas para aprovechar sus fortalezas.
+## 5.5 Función para Gráfico de Histograma
+```python
+import matplotlib.pyplot as plt
 
-Con esta guía podrás utilizar **Matplotlib** y **Seaborn** para crear visualizaciones efectivas que te permitan comprender mejor tus datos.
+def plot_histogram(df, col, bins=10, title='Histograma', x_label='Valores', y_label='Frecuencia', color='blue', figsize=(10, 6)):
+    data = df.select(col).rdd.flatMap(lambda x: x).collect()
+    plt.figure(figsize=figsize)
+    plt.hist(data, bins=bins, color=color, edgecolor='black')
+    plt.title(title, fontsize=14)
+    plt.xlabel(x_label, fontsize=12)
+    plt.ylabel(y_label, fontsize=12)
+    plt.tight_layout()
+    plt.show()
+
+# Uso de la función (suponiendo que df es un DataFrame de PySpark)
+plot_histogram(df, 'Ventas', bins=15, title='Distribución de Ventas', x_label='Ventas')
+```
+
+## 5.6 Función para Gráfico de Heatmap con Seaborn
+```python
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+def plot_heatmap(df, title='Mapa de Calor', figsize=(10, 8), cmap='viridis'):
+    data = df.toPandas()
+    plt.figure(figsize=figsize)
+    sns.heatmap(data.corr(), annot=True, cmap=cmap)
+    plt.title(title, fontsize=14)
+    plt.tight_layout()
+    plt.show()
+
+# Uso de la función (suponiendo que df es un DataFrame de PySpark)
+plot_heatmap(df, title='Mapa de Calor de Correlaciones')
+```
+
+## 5.7 Función para Gráfico de Pie con Matplotlib
+```python
+import matplotlib.pyplot as plt
+
+def plot_pie(df, labels_col, values_col, title='Gráfico de Pie', figsize=(8, 8), autopct='%1.1f%%', startangle=140):
+    labels = df.select(labels_col).rdd.flatMap(lambda x: x).collect()
+    values = df.select(values_col).rdd.flatMap(lambda x: x).collect()
+    plt.figure(figsize=figsize)
+    plt.pie(values, labels=labels, autopct=autopct, startangle=startangle)
+    plt.title(title, fontsize=14)
+    plt.tight_layout()
+    plt.show()
+
+# Uso de la función (suponiendo que df es un DataFrame de PySpark)
+plot_pie(df, labels_col='Producto', values_col='Ventas', title='Distribución de Ventas por Producto')
+```
+
+Estas funciones te ayudarán a graficar diferentes tipos de datos de manera más rápida y eficiente, utilizando tanto **Matplotlib** como **Seaborn** para aprovechar sus puntos fuertes en visualización.
 
