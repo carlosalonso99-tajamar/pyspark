@@ -1,5 +1,7 @@
 # README: Transformaciones en Apache Spark
+[- Docs pyspark Databricks](https://api-docs.databricks.com/python/pyspark/latest/index.html)
 
+[- Docs pyspark oficial](https://spark.apache.org/docs/latest/api/python/index.html)
 Este documento detalla las principales transformaciones que se pueden realizar en Apache Spark, incluyendo transformaciones básicas y avanzadas tanto en RDDs como en DataFrames. Esta guía te ayudará a entender cómo manipular y transformar los datos de manera eficiente utilizando Spark.
 
 ## Tabla de Contenidos
