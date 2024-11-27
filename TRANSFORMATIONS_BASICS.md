@@ -128,7 +128,10 @@ Para comprobar las colunmas con null
 ```python
 df_nulls = df.select([F.count(when(col(c).isNull(), c)).alias(c) for c in df.columns])
 ```
-
+Remplazar nulos de columnas concretas
+```python
+df = df.fillna({"Description": "Unknown"})
+```
 Reemplaza valores nulos o específicos en el DataFrame.
 ```python
 df_filled = df.fillna(0)
